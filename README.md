@@ -2,6 +2,8 @@
 
 Home Assistant custom integration for EG.D / Distribuce24 OpenAPI.
 
+![EG.D icon](./icon.svg)
+
 ## What it does
 
 - Authenticates using OAuth2 `client_credentials` scope `namerena_data_openapi`.
@@ -12,6 +14,8 @@ Home Assistant custom integration for EG.D / Distribuce24 OpenAPI.
   - 15-minute valid-only series in attributes (optional).
   - Last successful fetch timestamp.
 - Fetches data once per day at configurable time with randomized minute offset.
+- Includes EG.D branded icon files (`icon.svg`, `custom_components/egd_openapi/logo.svg`).
+- Home Assistant integrační dlaždice používá ikonu z `manifest.json`; EG.D logo je součástí repozitáře/HACS (`icon.svg`, `logo.svg`).
 
 ## Install via HACS (Custom Repository)
 
@@ -47,6 +51,13 @@ Options allow changing:
 - `include_series_attribute` (default true)
 - Daily fetch time (default 16:xx local, random minute stored once)
 - `days_back_fetch` (default 1)
+
+## Updates from repository changes
+
+- HACS update detection is enabled for branch-based installs (`zip_release: false`).
+- To publish a new integration update, increase `custom_components/egd_openapi/manifest.json` `version`.
+- After version bump is pushed, HACS offers update in Home Assistant.
+- Codex PR helper nepodporuje binární soubory v těle PR diffu; proto používáme textové SVG ikony místo PNG.
 
 ## Notes
 
