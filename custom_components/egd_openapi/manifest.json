@@ -1,4 +1,5 @@
 {
+  "_comment_version": "1.0.5",
   "domain": "egd_openapi",
   "name": "EG.D OpenAPI (Distribuce24)",
   "codeowners": [

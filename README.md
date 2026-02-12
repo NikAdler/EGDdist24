@@ -1,3 +1,4 @@
+<!-- Version: 1.0.5 -->
 # EG.D OpenAPI (Distribuce24) for Home Assistant
 
 Home Assistant custom integration for EG.D / Distribuce24 OpenAPI.
