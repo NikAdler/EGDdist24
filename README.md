@@ -14,8 +14,8 @@ Home Assistant custom integration for EG.D / Distribuce24 OpenAPI.
   - 15-minute valid-only series in attributes (optional).
   - Last successful fetch timestamp.
 - Fetches data once per day at configurable time with randomized minute offset.
-- Includes EG.D branded icon files (`icon.svg`, `custom_components/egd_openapi/logo.svg`).
-- Home Assistant integrační dlaždice používá ikonu z `manifest.json`; EG.D logo je součástí repozitáře/HACS (`icon.svg`, `logo.svg`).
+- Includes EG.D branded icon files as text-only SVG (`icon.svg`, `custom_components/egd_openapi/logo.svg`).
+- Home Assistant integrační dlaždice používá ikonu z `manifest.json`; EG.D logo pro dokumentaci/repo je přes `icon.svg` a `logo.svg`.
 
 ## Install via HACS (Custom Repository)
 
@@ -57,7 +57,27 @@ Options allow changing:
 - HACS update detection is enabled for branch-based installs (`zip_release: false`).
 - To publish a new integration update, increase `custom_components/egd_openapi/manifest.json` `version`.
 - After version bump is pushed, HACS offers update in Home Assistant.
-- Codex PR helper nepodporuje binární soubory v těle PR diffu; proto používáme textové SVG ikony místo PNG.
+- Scheduler byl upraven na přesné denní plánování přes `async_track_point_in_time` v timezone Europe/Prague, aby se fetch spouštěl i po delším běhu spolehlivě jednou denně.
+- Codex PR helper nepodporuje binární soubory v těle PR diffu; proto jsou v repozitáři pouze SVG ikony.
+
+
+## Troubleshooting: PR diff, icon/logo a verze 1.0.0
+
+Pokud po instalaci vidíš stále verzi `1.0.0` nebo se nezobrazuje ikona:
+
+1. Ověř, že HACS míří na správný repozitář a branch.
+2. V Home Assistant otevři **Developer Tools → YAML** a spusť `Reload` pro custom integrations (nebo restart HA).
+3. Ověř nainstalovaný manifest na disku (add-on Terminal / SSH):
+   - `cat /config/custom_components/egd_openapi/manifest.json`
+   - musí ukazovat aktuální `version` (v tomto repozitáři je `1.0.5`).
+4. Pokud je na disku stará verze, smaž integraci z HACS, odstraň adresář
+   `/config/custom_components/egd_openapi`, restartuj HA a nainstaluj znovu.
+5. V HACS klikni na **Re-download** a potom **Check for updates**.
+
+Poznámka k ikonám:
+- V Codex workflow drž pouze textové ikony (SVG), jinak tlačítko "Vytvořit PR" selže.
+- Pokud chceš PNG kvůli GitHub/HACS vzhledu, stáhni `icon.svg`/`logo.svg`, převeď lokálně na PNG a nahraj ručně přes GitHub UI (mimo Codex PR helper).
+- Ikony v HA UI se i tak často řídí interním brand registry nebo `manifest` `icon` (mdi).
 
 ## Notes
 
