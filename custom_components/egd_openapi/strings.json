@@ -1,0 +1,57 @@
+{
+  "_comment_version": "1.0.5",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Configure EG.D OpenAPI",
+        "description": "Connect to Distribuce24 OpenAPI.",
+        "data": {
+          "environment": "Environment",
+          "client_id": "Client ID",
+          "client_secret": "Client Secret",
+          "ean": "EAN",
+          "measurement_type": "Measurement type",
+          "zdroj_dat": "Data source (C1 only)"
+        }
+      },
+      "profiles": {
+        "title": "Select profiles",
+        "description": "Choose one or more profiles for this EAN.",
+        "data": {
+          "selected_profiles": "Profiles"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Cannot connect to Distribuce24 API.",
+      "auth": "Authentication failed. Check credentials.",
+      "profiles_required": "Select at least one profile."
+    },
+    "abort": {
+      "already_configured": "This EAN is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "EG.D OpenAPI options",
+        "data": {
+          "selected_profiles": "Profiles",
+          "days_to_keep_series": "Days to keep series",
+          "include_series_attribute": "Include series attribute",
+          "fetch_hour": "Daily fetch hour",
+          "fetch_minute": "Daily fetch minute",
+          "days_back_fetch": "Days back to fetch"
+        }
+      }
+    }
+  },
+  "selector": {
+    "environment": {
+      "options": {
+        "production": "Production",
+        "test": "Test"
+      }
+    }
+  }
+}

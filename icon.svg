@@ -1,0 +1,32 @@
+<!-- Version: 1.0.5 -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-label="EG.D icon">
+  <defs>
+    <linearGradient id="gGreen" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#7ad143"/>
+      <stop offset="100%" stop-color="#0e9a7c"/>
+    </linearGradient>
+    <linearGradient id="gBlue" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#95d5ff"/>
+      <stop offset="100%" stop-color="#1d73cc"/>
+    </linearGradient>
+    <linearGradient id="gBolt" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#ffd52b"/>
+      <stop offset="100%" stop-color="#f58900"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="400" height="400" fill="none"/>
+
+  <g transform="skewX(-8)">
+    <rect x="32" y="82" width="95" height="62" rx="8" fill="url(#gGreen)"/>
+    <rect x="32" y="154" width="95" height="62" rx="8" fill="url(#gGreen)" opacity="0.95"/>
+    <rect x="32" y="226" width="95" height="62" rx="8" fill="url(#gGreen)" opacity="0.9"/>
+
+    <rect x="138" y="82" width="95" height="62" rx="8" fill="url(#gBlue)"/>
+    <rect x="138" y="154" width="95" height="62" rx="8" fill="url(#gBlue)" opacity="0.95"/>
+    <rect x="138" y="226" width="95" height="62" rx="8" fill="url(#gBlue)" opacity="0.9"/>
+    <rect x="274" y="226" width="68" height="62" rx="8" fill="url(#gBlue)" opacity="0.92"/>
+  </g>
+
+  <path fill="url(#gBolt)" d="M246 64l111-26-54 108 61-15-130 231 22-133-57 4 45-94-5-75z"/>
+</svg>
