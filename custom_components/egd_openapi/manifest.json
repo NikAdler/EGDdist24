@@ -1,0 +1,17 @@
+{
+  "domain": "egd_openapi",
+  "name": "EG.D OpenAPI (Distribuce24)",
+  "codeowners": [
+    "@your-github-user"
+  ],
+  "config_flow": true,
+  "documentation": "https://github.com/example/egd-openapi-homeassistant",
+  "issue_tracker": "https://github.com/example/egd-openapi-homeassistant/issues",
+  "iot_class": "cloud_polling",
+  "loggers": [
+    "custom_components.egd_openapi"
+  ],
+  "requirements": [],
+  "version": "1.0.5",
+  "icon": "mdi:transmission-tower"
+}
