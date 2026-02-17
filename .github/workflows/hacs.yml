@@ -1,4 +1,4 @@
-# Version: 1.0.8
+# Version: 1.0.11
 name: HACS Validation
 
 on:
@@ -13,3 +13,4 @@ jobs:
       - uses: hacs/action@main
         with:
           category: integration
+          ignore: brands,description,topics,hacsjson

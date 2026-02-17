@@ -1,4 +1,4 @@
-# Version: 1.0.8
+# Version: 1.0.11
 """Sensors for EG.D OpenAPI."""
 
 from __future__ import annotations
