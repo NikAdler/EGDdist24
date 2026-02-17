@@ -1,4 +1,4 @@
-<!-- Version: 1.0.7 -->
+<!-- Version: 1.0.8 -->
 # EG.D OpenAPI (Distribuce24) for Home Assistant
 
 Home Assistant custom integration for EG.D / Distribuce24 OpenAPI.
@@ -11,6 +11,7 @@ Home Assistant custom integration for EG.D / Distribuce24 OpenAPI.
 - Supports **production** and optional **test** environments.
 - Configured fully via the Home Assistant UI (config flow, no YAML).
 - Creates sensors per selected profile for one EAN per config entry:
+  - Entity names are human-friendly (import/export + granularity + purpose) instead of raw profile codes only.
   - Daily valid-only energy total in kWh.
   - 15-minute valid-only series in attributes (optional).
   - Last successful fetch timestamp.
@@ -71,7 +72,7 @@ Pokud po instalaci vidíš stále verzi `1.0.0` nebo se nezobrazuje ikona:
 2. V Home Assistant otevři **Developer Tools → YAML** a spusť `Reload` pro custom integrations (nebo restart HA).
 3. Ověř nainstalovaný manifest na disku (add-on Terminal / SSH):
    - `cat /config/custom_components/egd_openapi/manifest.json`
-   - musí ukazovat aktuální `version` (v tomto repozitáři je `1.0.7`).
+   - musí ukazovat aktuální `version` (v tomto repozitáři je `1.0.8`).
 4. Pokud je na disku stará verze, smaž integraci z HACS, odstraň adresář
    `/config/custom_components/egd_openapi`, restartuj HA a nainstaluj znovu.
 5. V HACS klikni na **Re-download** a potom **Check for updates**.

@@ -1,4 +1,4 @@
-# Version: 1.0.7
+# Version: 1.0.8
 """Diagnostics for EG.D OpenAPI."""
 
 from __future__ import annotations

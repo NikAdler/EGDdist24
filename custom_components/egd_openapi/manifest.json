@@ -1,5 +1,5 @@
 {
-  "_comment_version": "1.0.7",
+  "_comment_version": "1.0.8",
   "domain": "egd_openapi",
   "name": "EG.D OpenAPI (Distribuce24)",
   "codeowners": [
@@ -13,6 +13,6 @@
     "custom_components.egd_openapi"
   ],
   "requirements": [],
-  "version": "1.0.7",
+  "version": "1.0.8",
   "icon": "mdi:transmission-tower"
 }

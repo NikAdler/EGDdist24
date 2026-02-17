@@ -1,4 +1,4 @@
-# Version: 1.0.7
+# Version: 1.0.8
 """EG.D OpenAPI integration."""
 
 from __future__ import annotations

@@ -1,4 +1,4 @@
-# Version: 1.0.7
+# Version: 1.0.8
 """Sensors for EG.D OpenAPI."""
 
 from __future__ import annotations
@@ -61,6 +61,31 @@ class EGDBaseSensor(CoordinatorEntity[EGDOpenAPICoordinator], SensorEntity):
             "model": "OpenAPI",
         }
 
+    def _profile_label(self) -> str:
+        """Return user-friendly profile label."""
+        profile_name = self.coordinator.profile_name(self._profile_code)
+        code = self._profile_code.upper()
+
+        if code.startswith("IS"):
+            direction = "Export to grid"
+        elif code.startswith("IC"):
+            direction = "Import consumption"
+        else:
+            direction = "Measured energy"
+
+        if "Q" in code:
+            granularity = "quarter-hour"
+        elif "H" in code:
+            granularity = "hourly"
+        elif "C" in code:
+            granularity = "consumption curve"
+        else:
+            granularity = "profile"
+
+        if profile_name and profile_name != self._profile_code:
+            return f"{direction} {granularity} ({profile_name}, {self._profile_code})"
+        return f"{direction} {granularity} ({self._profile_code})"
+
 
 class EGDDailyEnergySensor(EGDBaseSensor):
     """Yesterday daily energy sensor."""
@@ -71,7 +96,7 @@ class EGDDailyEnergySensor(EGDBaseSensor):
 
     def __init__(self, coordinator: EGDOpenAPICoordinator, ean: str, profile_code: str) -> None:
         super().__init__(coordinator, ean, profile_code, "daily_energy")
-        self._attr_name = f"{profile_code} Daily Energy"
+        self._attr_name = f"{self._profile_label()} - Yesterday energy"
 
     @property
     def native_value(self) -> float | None:
@@ -102,7 +127,7 @@ class EGDSeriesSensor(EGDBaseSensor):
 
     def __init__(self, coordinator: EGDOpenAPICoordinator, ean: str, profile_code: str) -> None:
         super().__init__(coordinator, ean, profile_code, "series")
-        self._attr_name = f"{profile_code} Series"
+        self._attr_name = f"{self._profile_label()} - 15-minute series"
 
     @property
     def native_value(self) -> str | float | None:
@@ -136,7 +161,7 @@ class EGDLastUpdateSensor(CoordinatorEntity[EGDOpenAPICoordinator], SensorEntity
     def __init__(self, coordinator: EGDOpenAPICoordinator, ean: str) -> None:
         super().__init__(coordinator)
         self._ean = ean
-        self._attr_name = "Last Update"
+        self._attr_name = "Last successful update"
         self._attr_unique_id = f"{ean}_last_update"
 
     @property
