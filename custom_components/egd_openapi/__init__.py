@@ -1,5 +1,5 @@
+# Version: 1.0.7
 """EG.D OpenAPI integration."""
-# Version: 1.0.5
 
 from __future__ import annotations
 
@@ -18,9 +18,7 @@ from .api import EGDOpenAPIClient
 from .const import (
     CONF_CLIENT_ID,
     CONF_CLIENT_SECRET,
-    CONF_FETCH_HOUR,
     CONF_FETCH_MINUTE,
-    DEFAULT_FETCH_HOUR,
     DOMAIN,
     PLATFORMS,
     UNSUB_SCHEDULE,
@@ -49,40 +47,39 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = {"coordinator": coordinator}
 
-    _schedule_daily_refresh(hass, entry, coordinator)
+    _schedule_hourly_refresh(hass, entry, coordinator)
 
     await hass.config_entries.async_forward_entry_setups(entry, [Platform.SENSOR])
     entry.async_on_unload(entry.add_update_listener(async_reload_entry))
     return True
 
 
-def _schedule_daily_refresh(
+def _schedule_hourly_refresh(
     hass: HomeAssistant,
     entry: ConfigEntry,
     coordinator: EGDOpenAPICoordinator,
 ) -> None:
-    """Schedule refresh at a fixed local time in Europe/Prague and re-schedule daily."""
-    hour = int(entry.options.get(CONF_FETCH_HOUR, DEFAULT_FETCH_HOUR))
+    """Schedule refresh once per hour at configured minute in Europe/Prague."""
     minute = int(entry.options.get(CONF_FETCH_MINUTE, entry.data.get(CONF_FETCH_MINUTE, 1)))
     prague_tz = dt_util.get_time_zone("Europe/Prague")
 
     def _next_run(now_local: datetime) -> datetime:
-        next_local = now_local.replace(hour=hour, minute=minute, second=0, microsecond=0)
-        if next_local <= now_local:
-            next_local = next_local + timedelta(days=1)
-        return next_local.astimezone(dt_util.UTC)
+        run_local = now_local.replace(minute=minute, second=0, microsecond=0)
+        if run_local <= now_local:
+            run_local = run_local + timedelta(hours=1)
+        return run_local.astimezone(dt_util.UTC)
 
     async def _schedule_next(now_utc: datetime | None = None) -> None:
         local_now = (now_utc or dt_util.now()).astimezone(prague_tz)
         run_at_utc = _next_run(local_now)
         _LOGGER.debug(
-            "Scheduling EG.D next refresh for %s local (%s UTC)",
+            "Scheduling EG.D next hourly refresh for %s local (%s UTC)",
             run_at_utc.astimezone(prague_tz).isoformat(),
             run_at_utc.isoformat(),
         )
 
         async def _run_scheduled(_: datetime) -> None:
-            _LOGGER.debug("Scheduled EG.D refresh triggered")
+            _LOGGER.debug("Scheduled EG.D hourly refresh triggered")
             await coordinator.async_request_refresh()
             await _schedule_next()
 

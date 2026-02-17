@@ -1,5 +1,5 @@
+# Version: 1.0.7
 """Constants for EG.D OpenAPI integration."""
-# Version: 1.0.5
 
 from __future__ import annotations
 

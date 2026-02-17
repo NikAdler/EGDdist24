@@ -1,18 +1,18 @@
 {
-  "_comment_version": "1.0.5",
+  "_comment_version": "1.0.7",
   "domain": "egd_openapi",
   "name": "EG.D OpenAPI (Distribuce24)",
   "codeowners": [
-    "@your-github-user"
+    "@NikAdler"
   ],
   "config_flow": true,
-  "documentation": "https://github.com/example/egd-openapi-homeassistant",
-  "issue_tracker": "https://github.com/example/egd-openapi-homeassistant/issues",
+  "documentation": "https://github.com/NikAdler/EGDdist24",
+  "issue_tracker": "https://github.com/NikAdler/EGDdist24/issues",
   "iot_class": "cloud_polling",
   "loggers": [
     "custom_components.egd_openapi"
   ],
   "requirements": [],
-  "version": "1.0.5",
+  "version": "1.0.7",
   "icon": "mdi:transmission-tower"
 }

@@ -1,4 +1,4 @@
-<!-- Version: 1.0.5 -->
+<!-- Version: 1.0.7 -->
 # EG.D OpenAPI (Distribuce24) for Home Assistant
 
 Home Assistant custom integration for EG.D / Distribuce24 OpenAPI.
@@ -14,7 +14,8 @@ Home Assistant custom integration for EG.D / Distribuce24 OpenAPI.
   - Daily valid-only energy total in kWh.
   - 15-minute valid-only series in attributes (optional).
   - Last successful fetch timestamp.
-- Fetches data once per day at configurable time with randomized minute offset.
+- Fetches data once per hour (at configured minute) with lightweight periodic polling.
+- API requests are executed automatically once per hour (plus optional manual refresh by user).
 - Includes EG.D branded icon files as text-only SVG (`icon.svg`, `custom_components/egd_openapi/logo.svg`).
 - Home Assistant integrační dlaždice používá ikonu z `manifest.json`; EG.D logo pro dokumentaci/repo je přes `icon.svg` a `logo.svg`.
 
@@ -50,7 +51,7 @@ Options allow changing:
 - Selected profiles
 - `days_to_keep_series` (default 7)
 - `include_series_attribute` (default true)
-- Daily fetch time (default 16:xx local, random minute stored once)
+- Hourly fetch minute (random minute stored once to spread API load)
 - `days_back_fetch` (default 1)
 
 ## Updates from repository changes
@@ -58,7 +59,7 @@ Options allow changing:
 - HACS update detection is enabled for branch-based installs (`zip_release: false`).
 - To publish a new integration update, increase `custom_components/egd_openapi/manifest.json` `version`.
 - After version bump is pushed, HACS offers update in Home Assistant.
-- Scheduler byl upraven na přesné denní plánování přes `async_track_point_in_time` v timezone Europe/Prague, aby se fetch spouštěl i po delším běhu spolehlivě jednou denně.
+- Scheduler používá přesné hodinové plánování přes `async_track_point_in_time` v timezone Europe/Prague, aby se fetch spouštěl i po delším běhu spolehlivě jednou za hodinu.
 - Codex PR helper nepodporuje binární soubory v těle PR diffu; proto jsou v repozitáři pouze SVG ikony.
 
 
@@ -70,7 +71,7 @@ Pokud po instalaci vidíš stále verzi `1.0.0` nebo se nezobrazuje ikona:
 2. V Home Assistant otevři **Developer Tools → YAML** a spusť `Reload` pro custom integrations (nebo restart HA).
 3. Ověř nainstalovaný manifest na disku (add-on Terminal / SSH):
    - `cat /config/custom_components/egd_openapi/manifest.json`
-   - musí ukazovat aktuální `version` (v tomto repozitáři je `1.0.5`).
+   - musí ukazovat aktuální `version` (v tomto repozitáři je `1.0.7`).
 4. Pokud je na disku stará verze, smaž integraci z HACS, odstraň adresář
    `/config/custom_components/egd_openapi`, restartuj HA a nainstaluj znovu.
 5. V HACS klikni na **Re-download** a potom **Check for updates**.
@@ -82,7 +83,7 @@ Poznámka k ikonám:
 
 ## Notes
 
-- Daily updates: designed for once-per-day fetching.
+- Hourly updates: designed for once-per-hour fetching.
 - Valid-only policy:
   - A/B: includes only status `IU012`
   - C1: includes only status `W`
