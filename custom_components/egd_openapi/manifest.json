@@ -1,0 +1,16 @@
+{
+  "domain": "egd_openapi",
+  "name": "EG.D OpenAPI (Distribuce24)",
+  "codeowners": [
+    "@NikAdler"
+  ],
+  "config_flow": true,
+  "documentation": "https://github.com/NikAdler/EGDdist24",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/NikAdler/EGDdist24/issues",
+  "loggers": [
+    "custom_components.egd_openapi"
+  ],
+  "requirements": [],
+  "version": "1.0.9"
+}
