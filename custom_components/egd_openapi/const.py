@@ -1,4 +1,3 @@
-# Version: 1.0.11
 """Constants for EG.D OpenAPI integration."""
 
 from __future__ import annotations

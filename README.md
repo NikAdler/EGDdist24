@@ -1,4 +1,3 @@
-<!-- Version: 1.0.11 -->
 # EG.D OpenAPI (Distribuce24) for Home Assistant
 
 Home Assistant custom integration for EG.D / Distribuce24 OpenAPI.
@@ -62,10 +61,7 @@ Options allow changing:
 - After version bump is pushed, HACS offers update in Home Assistant.
 - Scheduler používá přesné hodinové plánování přes `async_track_point_in_time` v timezone Europe/Prague, aby se fetch spouštěl i po delším běhu spolehlivě jednou za hodinu.
 - Codex PR helper nepodporuje binární soubory v těle PR diffu; proto jsou v repozitáři pouze SVG ikony.
-- JSON schema files (`manifest.json`, `strings.json`, `translations`) cannot contain custom comment keys because Hassfest enforces strict schemas.
 - HACS GitHub checks for repository description/topics/brands are external repository settings; CI workflow ignores these checks to avoid false CI failures.
-- HACS workflow explicitly ignores external repository checks and strict `hacsjson` CI check to prevent false failures unrelated to integration runtime.
-
 
 ## Troubleshooting: PR diff, icon/logo a verze 1.0.0
 
@@ -75,7 +71,7 @@ Pokud po instalaci vidíš stále verzi `1.0.0` nebo se nezobrazuje ikona:
 2. V Home Assistant otevři **Developer Tools → YAML** a spusť `Reload` pro custom integrations (nebo restart HA).
 3. Ověř nainstalovaný manifest na disku (add-on Terminal / SSH):
    - `cat /config/custom_components/egd_openapi/manifest.json`
-   - musí ukazovat aktuální `version` (v tomto repozitáři je `1.0.11`).
+   - musí ukazovat aktuální `version` (v tomto repozitáři je `1.1.0`).
 4. Pokud je na disku stará verze, smaž integraci z HACS, odstraň adresář
    `/config/custom_components/egd_openapi`, restartuj HA a nainstaluj znovu.
 5. V HACS klikni na **Re-download** a potom **Check for updates**.

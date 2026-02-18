@@ -1,4 +1,3 @@
-# Version: 1.0.11
 """Config flow for EG.D OpenAPI."""
 
 from __future__ import annotations

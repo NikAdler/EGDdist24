@@ -1,4 +1,3 @@
-# Version: 1.0.11
 """API client for EG.D OpenAPI."""
 
 from __future__ import annotations
