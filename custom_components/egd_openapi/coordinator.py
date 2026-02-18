@@ -172,13 +172,13 @@ class EGDOpenAPICoordinator(DataUpdateCoordinator[CoordinatorPayload]):
             if ts is None:
                 continue
 
-            value = self._parse_decimal(row.get("hodnota") or row.get("value") or row.get("spotreba"))
-            status = str(row.get("status") or row.get("stav") or "").strip()
-            unit = str(row.get("jednotka") or row.get("unit") or "kWh").strip()
+            value = self._extract_value(row)
+            status = self._extract_status(row)
+            unit = self._extract_unit(row)
 
             timestamp_ms = int(ts.astimezone(UTC).timestamp() * 1000)
 
-            if status != valid_status or value is None:
+            if status.upper() != valid_status.upper() or value is None:
                 invalid_points += 1
                 series_points.append([timestamp_ms, None])
                 continue
@@ -199,7 +199,14 @@ class EGDOpenAPICoordinator(DataUpdateCoordinator[CoordinatorPayload]):
 
     @staticmethod
     def _parse_timestamp(row: dict[str, Any]) -> datetime | None:
-        raw = row.get("cas") or row.get("timestamp") or row.get("datum") or row.get("time")
+        raw = (
+            row.get("cas")
+            or row.get("timestamp")
+            or row.get("datum")
+            or row.get("time")
+            or row.get("datumOd")
+            or row.get("from")
+        )
         if not raw:
             return None
 
@@ -227,6 +234,48 @@ class EGDOpenAPICoordinator(DataUpdateCoordinator[CoordinatorPayload]):
             return Decimal(str(value).replace(",", "."))
         except (InvalidOperation, ValueError):
             return None
+
+    @classmethod
+    def _extract_value(cls, row: dict[str, Any]) -> Decimal | None:
+        """Extract numeric value from multiple possible API row formats."""
+        direct = (
+            row.get("hodnota")
+            or row.get("value")
+            or row.get("spotreba")
+            or row.get("mnozstvi")
+        )
+        parsed = cls._parse_decimal(direct)
+        if parsed is not None:
+            return parsed
+
+        for key in ("hodnota", "value", "spotreba"):
+            raw = row.get(key)
+            if isinstance(raw, dict):
+                nested = raw.get("value") or raw.get("hodnota") or raw.get("mnozstvi")
+                parsed = cls._parse_decimal(nested)
+                if parsed is not None:
+                    return parsed
+        return None
+
+    @staticmethod
+    def _extract_status(row: dict[str, Any]) -> str:
+        """Extract status code from row; support string and object status payload."""
+        raw = row.get("status") or row.get("stav")
+        if isinstance(raw, dict):
+            raw = raw.get("kod") or raw.get("code") or raw.get("status")
+        if raw is None:
+            return ""
+        return str(raw).strip()
+
+    @staticmethod
+    def _extract_unit(row: dict[str, Any]) -> str:
+        """Extract unit from row; support nested object formats."""
+        raw = row.get("jednotka") or row.get("unit")
+        if isinstance(raw, dict):
+            raw = raw.get("kod") or raw.get("code") or raw.get("unit")
+        if raw is None:
+            return "kWh"
+        return str(raw).strip()
 
     @staticmethod
     def _normalize_to_kwh(value: Decimal, unit: str) -> Decimal:
