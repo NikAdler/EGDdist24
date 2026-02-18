@@ -62,6 +62,7 @@ Options allow changing:
 - Scheduler používá přesné hodinové plánování přes `async_track_point_in_time` v timezone Europe/Prague, aby se fetch spouštěl i po delším běhu spolehlivě jednou za hodinu.
 - Codex PR helper nepodporuje binární soubory v těle PR diffu; proto jsou v repozitáři pouze SVG ikony.
 - HACS GitHub checks for repository description/topics/brands are external repository settings; CI workflow ignores these checks to avoid false CI failures.
+- Repository description + topics + brands registration are GitHub-side requirements (cannot be fixed only by integration code).
 
 ## Troubleshooting: PR diff, icon/logo a verze 1.0.0
 
@@ -71,7 +72,7 @@ Pokud po instalaci vidíš stále verzi `1.0.0` nebo se nezobrazuje ikona:
 2. V Home Assistant otevři **Developer Tools → YAML** a spusť `Reload` pro custom integrations (nebo restart HA).
 3. Ověř nainstalovaný manifest na disku (add-on Terminal / SSH):
    - `cat /config/custom_components/egd_openapi/manifest.json`
-   - musí ukazovat aktuální `version` (v tomto repozitáři je `1.1.0`).
+   - musí ukazovat aktuální `version` (v tomto repozitáři je `1.1.1`).
 4. Pokud je na disku stará verze, smaž integraci z HACS, odstraň adresář
    `/config/custom_components/egd_openapi`, restartuj HA a nainstaluj znovu.
 5. V HACS klikni na **Re-download** a potom **Check for updates**.

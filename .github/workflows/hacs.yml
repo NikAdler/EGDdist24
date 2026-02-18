@@ -12,4 +12,7 @@ jobs:
       - uses: hacs/action@main
         with:
           category: integration
-          ignore: brands,description,topics,hacsjson
+          ignore: |
+            description
+            topics
+            brands
