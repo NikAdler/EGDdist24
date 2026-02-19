@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 DOMAIN = "egd_openapi"
-NAME = "EG.D OpenAPI (Distribuce24)"
+NAME = "EG.D OpenAPI – Distribuce24"
 
 CONF_ENVIRONMENT = "environment"
 CONF_CLIENT_ID = "client_id"

@@ -1,97 +1,76 @@
-# EG.D OpenAPI (Distribuce24) for Home Assistant
+# EG.D OpenAPI – Distribuce24 (Home Assistant)
 
-Home Assistant custom integration for EG.D / Distribuce24 OpenAPI.
+Vlastní integrace Home Assistant pro EG.D / Distribuce24 OpenAPI.
 
-![EG.D icon](./icon.svg)
+![Logo EG.D](./icon.svg)
 
-## What it does
+## Co integrace dělá
 
-- Authenticates using OAuth2 `client_credentials` scope `namerena_data_openapi`.
-- Supports **production** and optional **test** environments.
-- Configured fully via the Home Assistant UI (config flow, no YAML).
-- Creates sensors per selected profile for one EAN per config entry:
-  - Entity names are human-friendly (import/export + granularity + purpose) instead of raw profile codes only.
-  - Daily valid-only energy total in kWh.
-  - 15-minute valid-only series in attributes (optional).
-  - Last successful fetch timestamp.
-- Fetches data once per hour (at configured minute) with lightweight periodic polling.
-- API requests are executed automatically once per hour (plus optional manual refresh by user).
-- Parsing consumption rows now supports nested `status`/`value`/`unit` formats from API responses to prevent false zero totals when data are present.
-- Options flow now gracefully supports older config entries without `profile_map` to prevent 500 errors in Settings.
-- Includes EG.D branded icon files as text-only SVG (`icon.svg`, `custom_components/egd_openapi/logo.svg`).
-- Home Assistant integrační dlaždice používá ikonu z `manifest.json`; EG.D logo pro dokumentaci/repo je přes `icon.svg` a `logo.svg`.
+- Přihlášení přes OAuth2 `client_credentials` se scope `namerena_data_openapi`.
+- Podpora prostředí **produkce** i **test**.
+- Nastavení přes UI (config flow), bez YAML konfigurace.
+- Senzory pro vybrané profily na jedno EAN:
+  - denní energie (kWh),
+  - 15min řada v atributu (volitelně),
+  - čas posledního úspěšného načtení.
+- Automatické načítání dat 1× za hodinu.
 
-## Install via HACS (Custom Repository)
+## Instalace přes HACS (Custom repository)
 
-1. Open HACS in Home Assistant.
-2. Go to **Integrations**.
-3. Open the 3-dot menu → **Custom repositories**.
-4. Add this repository URL.
-5. Category: **Integration**.
-6. Install **EG.D OpenAPI (Distribuce24)**.
-7. Restart Home Assistant.
+1. V Home Assistant otevři HACS.
+2. Integrations → menu se 3 tečkami → **Custom repositories**.
+3. Přidej URL tohoto repozitáře, typ **Integration**.
+4. Nainstaluj **EG.D OpenAPI – Distribuce24**.
+5. Restartuj Home Assistant.
 
-## Manual install
+## Proč HACS někdy píše „Commit ... bude stažen“
 
-1. Copy `custom_components/egd_openapi` into your Home Assistant `custom_components` directory.
-2. Restart Home Assistant.
-3. Go to **Settings → Devices & Services → Add Integration**.
-4. Search for **EG.D OpenAPI (Distribuce24)**.
+Tohle je standardní chování HACS při instalaci z větve bez release.
+Aby HACS zobrazoval čitelnou verzi místo commitu, používej GitHub Release:
 
-## Configuration (UI only)
+- v `custom_components/egd_openapi/manifest.json` zvyš `version`,
+- vytvoř GitHub **tag** a **release** se stejnou verzí,
+- HACS pak nabídne instalaci/release podle verze.
 
-Setup asks for:
-- Environment (production or test)
-- `client_id`
-- `client_secret`
-- EAN (single)
-- Measurement type (`A/B` or `C1`)
-- `zdrojDat` (for C1)
-- Profile multi-select loaded from API
+Repo je pro to připravené (`zip_release: true` v `hacs.json`).
 
-Options allow changing:
-- Selected profiles
-- `days_to_keep_series` (default 7)
-- `include_series_attribute` (default true)
-- Hourly fetch minute (random minute stored once to spread API load)
-- `days_back_fetch` (default 1)
+## Nastavení integrace
 
-## Updates from repository changes
+Při prvním spuštění zadáš:
 
-- HACS update detection is enabled for branch-based installs (`zip_release: false`).
-- To publish a new integration update, increase `custom_components/egd_openapi/manifest.json` `version`.
-- After version bump is pushed, HACS offers update in Home Assistant.
-- Scheduler používá přesné hodinové plánování přes `async_track_point_in_time` v timezone Europe/Prague, aby se fetch spouštěl i po delším běhu spolehlivě jednou za hodinu.
-- Codex PR helper nepodporuje binární soubory v těle PR diffu; proto jsou v repozitáři pouze SVG ikony.
-- HACS GitHub checks for repository description/topics/brands are external repository settings; CI workflow ignores these checks to avoid false CI failures.
-- Repository description + topics + brands registration are GitHub-side requirements (cannot be fixed only by integration code).
+- prostředí (production/test),
+- `client_id`, `client_secret`,
+- EAN,
+- typ měření (`A/B` nebo `C1`),
+- zdroj dat pro C1,
+- výběr profilů.
 
-## Troubleshooting: PR diff, icon/logo a verze 1.0.0
+V nastavení integrace lze měnit:
 
-Pokud po instalaci vidíš stále verzi `1.0.0` nebo se nezobrazuje ikona:
+- vybrané profily,
+- kolik dní držet řadu,
+- zapnutí/vypnutí atributu se sérií,
+- minutu hodinového načítání,
+- počet dní zpětného načtení.
 
-1. Ověř, že HACS míří na správný repozitář a branch.
-2. V Home Assistant otevři **Developer Tools → YAML** a spusť `Reload` pro custom integrations (nebo restart HA).
-3. Ověř nainstalovaný manifest na disku (add-on Terminal / SSH):
-   - `cat /config/custom_components/egd_openapi/manifest.json`
-   - musí ukazovat aktuální `version` (v tomto repozitáři je `1.1.3`).
-4. Pokud je na disku stará verze, smaž integraci z HACS, odstraň adresář
-   `/config/custom_components/egd_openapi`, restartuj HA a nainstaluj znovu.
-5. V HACS klikni na **Re-download** a potom **Check for updates**.
+## Poznámky
 
-Poznámka k ikonám:
-- V Codex workflow drž pouze textové ikony (SVG), jinak tlačítko "Vytvořit PR" selže.
-- Pokud chceš PNG kvůli GitHub/HACS vzhledu, stáhni `icon.svg`/`logo.svg`, převeď lokálně na PNG a nahraj ručně přes GitHub UI (mimo Codex PR helper).
-- Ikony v HA UI se i tak často řídí interním brand registry nebo `manifest` `icon` (mdi).
+- Časové plánování běží spolehlivě 1× za hodinu.
+- Validní body:
+  - A/B: `IU012`
+  - C1: `W`
+- Nevalidní body se počítají a do řady jdou jako `null`.
 
-## Notes
+## Troubleshooting
 
-- Hourly updates: designed for once-per-hour fetching.
-- Valid-only policy:
-  - A/B: includes only status `IU012`
-  - C1: includes only status `W`
-- Invalid points are counted and emitted as `null` in series.
+Pokud po aktualizaci nevidíš novou verzi:
 
-## License
+1. Zkontroluj `/config/custom_components/egd_openapi/manifest.json`.
+2. V HACS dej **Re-download**.
+3. Restartuj Home Assistant.
+
+Aktuální verze v tomto repozitáři: **1.1.4**.
+
+## Licence
 
 MIT
