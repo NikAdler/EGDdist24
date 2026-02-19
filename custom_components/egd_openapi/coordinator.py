@@ -106,8 +106,8 @@ class EGDOpenAPICoordinator(DataUpdateCoordinator[CoordinatorPayload]):
             end_local = datetime.combine(day, time.max, tzinfo=local_tz)
 
             if measurement_type == MEASUREMENT_C1:
-                from_param = start_local.isoformat()
-                to_param = end_local.isoformat()
+                from_param = start_local.replace(microsecond=0).isoformat()
+                to_param = end_local.replace(microsecond=0).isoformat()
             else:
                 from_param = start_local.astimezone(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")
                 to_param = end_local.astimezone(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")

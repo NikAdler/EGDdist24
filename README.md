@@ -69,7 +69,7 @@ Pokud po aktualizaci nevidíš novou verzi:
 2. V HACS dej **Re-download**.
 3. Restartuj Home Assistant.
 
-Aktuální verze v tomto repozitáři: **1.1.5**.
+Aktuální verze v tomto repozitáři: **1.1.6**.
 
 ## Licence
 

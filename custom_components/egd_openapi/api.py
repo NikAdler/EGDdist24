@@ -114,10 +114,16 @@ class EGDOpenAPIClient:
                         params=params,
                         headers=headers,
                     ) as retry_resp:
-                        retry_resp.raise_for_status()
+                        if retry_resp.status >= 400:
+                            body = (await retry_resp.text()).strip()
+                            raise EGDAPIError(
+                                f"Distribuce24 API request failed: {retry_resp.status} ({body})"
+                            )
                         return await retry_resp.json()
 
-                resp.raise_for_status()
+                if resp.status >= 400:
+                    body = (await resp.text()).strip()
+                    raise EGDAPIError(f"Distribuce24 API request failed: {resp.status} ({body})")
                 return await resp.json()
         except ClientResponseError as err:
             if err.status in (401, 403):
@@ -175,9 +181,28 @@ class EGDOpenAPIClient:
                 "profile": profile,
                 "from": time_from,
                 "to": time_to,
-                "zdrojDat": zdroj_dat,
             }
-            raw = await self._request("GET", "c/spotreby", params=params)
+            if zdroj_dat:
+                params["zdrojDat"] = zdroj_dat
+
+            try:
+                raw = await self._request("GET", "c/spotreby", params=params)
+            except EGDAPIError as err:
+                if "failed: 400" not in str(err):
+                    raise
+
+                fallback_params = {
+                    "ean": ean,
+                    "profile": profile,
+                    "from": self._normalize_iso_for_api(time_from),
+                    "to": self._normalize_iso_for_api(time_to),
+                }
+                _LOGGER.debug(
+                    "Retrying c/spotreby without zdrojDat and normalized timestamps for profile %s",
+                    profile,
+                )
+                raw = await self._request("GET", "c/spotreby", params=fallback_params)
+
             return self._extract_rows(raw)
 
         page_start = 0
@@ -204,6 +229,18 @@ class EGDOpenAPIClient:
             page_start += len(rows)
 
         return all_rows
+
+    @staticmethod
+    def _normalize_iso_for_api(value: str) -> str:
+        """Normalize date/time value to strict ISO-8601 UTC format for fallback requests."""
+        try:
+            parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        except ValueError:
+            return value
+
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=UTC)
+        return parsed.astimezone(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
     @staticmethod
     def _extract_rows(raw: Any) -> list[dict[str, Any]]:
