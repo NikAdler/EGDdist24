@@ -38,7 +38,6 @@
           "selected_profiles": "Profiles",
           "days_to_keep_series": "Days to keep series",
           "include_series_attribute": "Include series attribute",
-          "fetch_hour": "Daily fetch hour",
           "fetch_minute": "Daily fetch minute",
           "days_back_fetch": "Days back to fetch"
         }

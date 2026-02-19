@@ -17,6 +17,7 @@ Home Assistant custom integration for EG.D / Distribuce24 OpenAPI.
 - Fetches data once per hour (at configured minute) with lightweight periodic polling.
 - API requests are executed automatically once per hour (plus optional manual refresh by user).
 - Parsing consumption rows now supports nested `status`/`value`/`unit` formats from API responses to prevent false zero totals when data are present.
+- Options flow now gracefully supports older config entries without `profile_map` to prevent 500 errors in Settings.
 - Includes EG.D branded icon files as text-only SVG (`icon.svg`, `custom_components/egd_openapi/logo.svg`).
 - Home Assistant integrační dlaždice používá ikonu z `manifest.json`; EG.D logo pro dokumentaci/repo je přes `icon.svg` a `logo.svg`.
 
@@ -73,7 +74,7 @@ Pokud po instalaci vidíš stále verzi `1.0.0` nebo se nezobrazuje ikona:
 2. V Home Assistant otevři **Developer Tools → YAML** a spusť `Reload` pro custom integrations (nebo restart HA).
 3. Ověř nainstalovaný manifest na disku (add-on Terminal / SSH):
    - `cat /config/custom_components/egd_openapi/manifest.json`
-   - musí ukazovat aktuální `version` (v tomto repozitáři je `1.1.2`).
+   - musí ukazovat aktuální `version` (v tomto repozitáři je `1.1.3`).
 4. Pokud je na disku stará verze, smaž integraci z HACS, odstraň adresář
    `/config/custom_components/egd_openapi`, restartuj HA a nainstaluj znovu.
 5. V HACS klikni na **Re-download** a potom **Check for updates**.

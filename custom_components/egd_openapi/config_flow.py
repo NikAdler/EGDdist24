@@ -20,7 +20,6 @@ from .const import (
     CONF_DAYS_TO_KEEP_SERIES,
     CONF_EAN,
     CONF_ENVIRONMENT,
-    CONF_FETCH_HOUR,
     CONF_FETCH_MINUTE,
     CONF_INCLUDE_SERIES_ATTRIBUTE,
     CONF_MEASUREMENT_TYPE,
@@ -29,7 +28,6 @@ from .const import (
     CONF_ZDROJ_DAT,
     DEFAULT_DAYS_BACK_FETCH,
     DEFAULT_DAYS_TO_KEEP_SERIES,
-    DEFAULT_FETCH_HOUR,
     DEFAULT_INCLUDE_SERIES_ATTRIBUTE,
     DOMAIN,
     ENV_PRODUCTION,
@@ -192,6 +190,10 @@ class EGDOptionsFlow(config_entries.OptionsFlow):
             self.config_entry.data.get(CONF_SELECTED_PROFILES, []),
         )
 
+        if not profile_map:
+            # Backward compatibility for entries created before profile map existed.
+            profile_map = {code: code for code in selected_profiles}
+
         profile_options = [
             selector.SelectOptionDict(value=code, label=f"{code} - {name}")
             for code, name in profile_map.items()
@@ -217,10 +219,6 @@ class EGDOptionsFlow(config_entries.OptionsFlow):
                         DEFAULT_INCLUDE_SERIES_ATTRIBUTE,
                     ),
                 ): bool,
-                vol.Required(
-                    CONF_FETCH_HOUR,
-                    default=self.config_entry.options.get(CONF_FETCH_HOUR, DEFAULT_FETCH_HOUR),
-                ): vol.All(vol.Coerce(int), vol.Range(min=0, max=23)),
                 vol.Required(
                     CONF_FETCH_MINUTE,
                     default=self.config_entry.options.get(

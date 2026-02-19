@@ -255,6 +255,12 @@ class EGDOpenAPICoordinator(DataUpdateCoordinator[CoordinatorPayload]):
                 parsed = cls._parse_decimal(nested)
                 if parsed is not None:
                     return parsed
+
+        for key in ("hodnota", "value", "spotreba", "mnozstvi"):
+            nested_any = cls._deep_find_key(row, key)
+            parsed = cls._parse_decimal(nested_any)
+            if parsed is not None:
+                return parsed
         return None
 
     @staticmethod
@@ -263,6 +269,12 @@ class EGDOpenAPICoordinator(DataUpdateCoordinator[CoordinatorPayload]):
         raw = row.get("status") or row.get("stav")
         if isinstance(raw, dict):
             raw = raw.get("kod") or raw.get("code") or raw.get("status")
+        if raw is None:
+            for key in ("status", "stav", "kodStatusu", "statusCode", "kod"):
+                found = EGDOpenAPICoordinator._deep_find_key(row, key)
+                if found not in (None, ""):
+                    raw = found
+                    break
         if raw is None:
             return ""
         return str(raw).strip()
@@ -274,8 +286,31 @@ class EGDOpenAPICoordinator(DataUpdateCoordinator[CoordinatorPayload]):
         if isinstance(raw, dict):
             raw = raw.get("kod") or raw.get("code") or raw.get("unit")
         if raw is None:
+            for key in ("jednotka", "unit", "unitCode"):
+                found = EGDOpenAPICoordinator._deep_find_key(row, key)
+                if found not in (None, ""):
+                    raw = found
+                    break
+        if raw is None:
             return "kWh"
         return str(raw).strip()
+
+    @staticmethod
+    def _deep_find_key(payload: Any, key: str) -> Any | None:
+        """Recursively find first value for key in nested dict/list payload."""
+        if isinstance(payload, dict):
+            if key in payload:
+                return payload[key]
+            for val in payload.values():
+                found = EGDOpenAPICoordinator._deep_find_key(val, key)
+                if found is not None:
+                    return found
+        elif isinstance(payload, list):
+            for item in payload:
+                found = EGDOpenAPICoordinator._deep_find_key(item, key)
+                if found is not None:
+                    return found
+        return None
 
     @staticmethod
     def _normalize_to_kwh(value: Decimal, unit: str) -> Decimal:
