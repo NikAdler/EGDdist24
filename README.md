@@ -1,4 +1,4 @@
-# EG.D OpenAPI – Distribuce24 (Home Assistant)
+# EG.D OpenAPI (Distribuce24) pro Home Assistant
 
 Vlastní integrace Home Assistant pro EG.D / Distribuce24 OpenAPI.
 
@@ -20,7 +20,7 @@ Vlastní integrace Home Assistant pro EG.D / Distribuce24 OpenAPI.
 1. V Home Assistant otevři HACS.
 2. Integrations → menu se 3 tečkami → **Custom repositories**.
 3. Přidej URL tohoto repozitáře, typ **Integration**.
-4. Nainstaluj **EG.D OpenAPI – Distribuce24**.
+4. Nainstaluj **EG.D OpenAPI (Distribuce24)**.
 5. Restartuj Home Assistant.
 
 ## Proč HACS někdy píše „Commit ... bude stažen“
@@ -32,7 +32,7 @@ Aby HACS zobrazoval čitelnou verzi místo commitu, používej GitHub Release:
 - vytvoř GitHub **tag** a **release** se stejnou verzí,
 - HACS pak nabídne instalaci/release podle verze.
 
-Repo je pro to připravené (`zip_release: true` v `hacs.json`).
+Repo je nastavený na branch instalaci (`zip_release: false`), takže HACS bere aktuální commit z větve.
 
 ## Nastavení integrace
 
@@ -69,7 +69,7 @@ Pokud po aktualizaci nevidíš novou verzi:
 2. V HACS dej **Re-download**.
 3. Restartuj Home Assistant.
 
-Aktuální verze v tomto repozitáři: **1.1.4**.
+Aktuální verze v tomto repozitáři: **1.1.5**.
 
 ## Licence
 
