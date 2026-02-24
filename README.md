@@ -69,6 +69,17 @@ Pokud po aktualizaci nevidíš novou verzi:
 2. V HACS dej **Re-download**.
 3. Restartuj Home Assistant.
 
+Pokud v Supervisor logu vidíš chybu typu:
+
+`Can't read /data/addons/git/.../egd_dist24_mqtt/config.yaml: ... data['services'][0]`
+
+jde o **jiný projekt/add-on** (`egd_dist24_mqtt`), ne o tuto HACS integraci `custom_components/egd_openapi`.
+Tato chyba nevzniká v kódu této integrace. Obvykle pomůže:
+
+1. Odebrat nebo opravit problematický add-on repozitář v Supervisor/Add-on Store.
+2. Smazat starý add-on checkout z `/data/addons/git/...` (pokud tam zůstal po testování).
+3. Restartovat Supervisor.
+
 Aktuální verze v tomto repozitáři: **1.1.7**.
 
 ## Licence
