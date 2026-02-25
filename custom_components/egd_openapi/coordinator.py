@@ -176,7 +176,7 @@ class EGDOpenAPICoordinator(DataUpdateCoordinator[CoordinatorPayload]):
             status = self._extract_status(row)
             unit = self._extract_unit(row)
 
-            if status.upper() != valid_status.upper() or value is None:
+            if not self._is_valid_status(status, valid_status) or value is None:
                 invalid_points += 1
                 if ts is not None:
                     timestamp_ms = int(ts.astimezone(UTC).timestamp() * 1000)
@@ -204,6 +204,22 @@ class EGDOpenAPICoordinator(DataUpdateCoordinator[CoordinatorPayload]):
             rows_total=len(rows),
             points_without_timestamp=points_without_timestamp,
             series_points=series_points,
+        )
+
+    @staticmethod
+    def _is_valid_status(status: str, expected_code: str) -> bool:
+        """Accept both API status codes and localized status text."""
+        status_norm = status.strip().upper()
+        if status_norm == expected_code.upper():
+            return True
+
+        # Some API variants return human labels instead of status codes.
+        lowered = status.strip().lower()
+        return (
+            "platná" in lowered
+            or "platna" in lowered
+            or lowered == "valid"
+            or lowered.startswith("valid ")
         )
 
     @staticmethod

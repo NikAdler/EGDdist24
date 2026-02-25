@@ -246,9 +246,54 @@ class EGDOpenAPIClient:
     def _extract_rows(raw: Any) -> list[dict[str, Any]]:
         if isinstance(raw, list):
             return [r for r in raw if isinstance(r, dict)]
+
         if isinstance(raw, dict):
             for key in ("items", "data", "spotreby", "rows", "result", "measurements", "mereni", "values"):
                 val = raw.get(key)
                 if isinstance(val, list):
                     return [r for r in val if isinstance(r, dict)]
+
+            candidates = EGDOpenAPIClient._collect_list_candidates(raw)
+            if candidates:
+                return max(candidates, key=EGDOpenAPIClient._candidate_score)
+
         return []
+
+    @staticmethod
+    def _collect_list_candidates(payload: Any) -> list[list[dict[str, Any]]]:
+        """Recursively find all list-of-dict candidates in payload."""
+        found: list[list[dict[str, Any]]] = []
+
+        if isinstance(payload, dict):
+            for val in payload.values():
+                found.extend(EGDOpenAPIClient._collect_list_candidates(val))
+        elif isinstance(payload, list):
+            dict_items = [item for item in payload if isinstance(item, dict)]
+            if dict_items:
+                found.append(dict_items)
+            for item in payload:
+                found.extend(EGDOpenAPIClient._collect_list_candidates(item))
+
+        return found
+
+    @staticmethod
+    def _candidate_score(items: list[dict[str, Any]]) -> tuple[int, int]:
+        """Prefer the most row-like and longest list candidate."""
+        row_keys = (
+            "cas",
+            "timestamp",
+            "datum",
+            "time",
+            "datumOd",
+            "from",
+            "hodnota",
+            "value",
+            "spotreba",
+            "mnozstvi",
+            "status",
+            "stav",
+        )
+        row_like_count = sum(
+            1 for item in items if any(key in item for key in row_keys)
+        )
+        return (row_like_count, len(items))
