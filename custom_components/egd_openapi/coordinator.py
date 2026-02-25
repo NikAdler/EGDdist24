@@ -45,6 +45,8 @@ class ProfileDayData:
     window_end: datetime
     valid_points: int
     invalid_points: int
+    rows_total: int
+    points_without_timestamp: int
     series_points: list[list[int | float | None]]
 
 
@@ -164,29 +166,34 @@ class EGDOpenAPICoordinator(DataUpdateCoordinator[CoordinatorPayload]):
 
         valid_points = 0
         invalid_points = 0
+        points_without_timestamp = 0
         total_kwh = Decimal("0")
         series_points: list[list[int | float | None]] = []
 
         for row in rows:
             ts = self._parse_timestamp(row)
-            if ts is None:
-                continue
-
             value = self._extract_value(row)
             status = self._extract_status(row)
             unit = self._extract_unit(row)
 
-            timestamp_ms = int(ts.astimezone(UTC).timestamp() * 1000)
-
             if status.upper() != valid_status.upper() or value is None:
                 invalid_points += 1
-                series_points.append([timestamp_ms, None])
+                if ts is not None:
+                    timestamp_ms = int(ts.astimezone(UTC).timestamp() * 1000)
+                    series_points.append([timestamp_ms, None])
+                else:
+                    points_without_timestamp += 1
                 continue
 
             interval_kwh = self._normalize_to_kwh(value, unit)
             valid_points += 1
             total_kwh += interval_kwh
-            series_points.append([timestamp_ms, float(interval_kwh)])
+
+            if ts is not None:
+                timestamp_ms = int(ts.astimezone(UTC).timestamp() * 1000)
+                series_points.append([timestamp_ms, float(interval_kwh)])
+            else:
+                points_without_timestamp += 1
 
         return ProfileDayData(
             total_kwh=float(total_kwh),
@@ -194,6 +201,8 @@ class EGDOpenAPICoordinator(DataUpdateCoordinator[CoordinatorPayload]):
             window_end=window_end,
             valid_points=valid_points,
             invalid_points=invalid_points,
+            rows_total=len(rows),
+            points_without_timestamp=points_without_timestamp,
             series_points=series_points,
         )
 

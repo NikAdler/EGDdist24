@@ -247,7 +247,7 @@ class EGDOpenAPIClient:
         if isinstance(raw, list):
             return [r for r in raw if isinstance(r, dict)]
         if isinstance(raw, dict):
-            for key in ("items", "data", "spotreby", "rows", "result"):
+            for key in ("items", "data", "spotreby", "rows", "result", "measurements", "mereni", "values"):
                 val = raw.get(key)
                 if isinstance(val, list):
                     return [r for r in val if isinstance(r, dict)]

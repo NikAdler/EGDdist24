@@ -99,8 +99,10 @@ class EGDDailyEnergySensor(EGDBaseSensor):
             "profile_name": self.coordinator.profile_name(self._profile_code),
             "window_start": data.window_start.isoformat(),
             "window_end": data.window_end.isoformat(),
+            "rows_total": data.rows_total,
             "valid_points": data.valid_points,
             "invalid_points": data.invalid_points,
+            "points_without_timestamp": data.points_without_timestamp,
         }
 
 
