@@ -198,16 +198,20 @@ class EGDOpenAPICoordinator(DataUpdateCoordinator[CoordinatorPayload]):
         )
 
     @staticmethod
+    def _first_present(mapping: dict[str, Any], keys: tuple[str, ...]) -> Any | None:
+        """Return first non-None value present in mapping for keys."""
+        for key in keys:
+            if key in mapping and mapping[key] is not None:
+                return mapping[key]
+        return None
+
+    @staticmethod
     def _parse_timestamp(row: dict[str, Any]) -> datetime | None:
-        raw = (
-            row.get("cas")
-            or row.get("timestamp")
-            or row.get("datum")
-            or row.get("time")
-            or row.get("datumOd")
-            or row.get("from")
+        raw = EGDOpenAPICoordinator._first_present(
+            row,
+            ("cas", "timestamp", "datum", "time", "datumOd", "from"),
         )
-        if not raw:
+        if raw in (None, ""):
             return None
 
         if isinstance(raw, (int, float)):
@@ -216,34 +220,49 @@ class EGDOpenAPICoordinator(DataUpdateCoordinator[CoordinatorPayload]):
         if not isinstance(raw, str):
             return None
 
-        raw_norm = raw.replace("Z", "+00:00")
+        raw_norm = raw.strip().replace("Z", "+00:00")
         try:
             parsed = datetime.fromisoformat(raw_norm)
         except ValueError:
+            parsed = None
+
+        if parsed is None:
+            for fmt in ("%Y-%m-%d %H:%M:%S", "%d.%m.%Y %H:%M:%S", "%Y-%m-%dT%H:%M:%S"):
+                try:
+                    parsed = datetime.strptime(raw_norm, fmt)
+                    break
+                except ValueError:
+                    continue
+
+        if parsed is None:
             return None
 
         if parsed.tzinfo is None:
-            parsed = parsed.replace(tzinfo=UTC)
+            local_tz = dt_util.get_time_zone("Europe/Prague")
+            parsed = parsed.replace(tzinfo=local_tz)
         return parsed.astimezone(UTC)
 
     @staticmethod
     def _parse_decimal(value: Any) -> Decimal | None:
         if value is None:
             return None
+        raw = str(value).strip().replace(" ", " ").replace(" ", "")
+        raw = raw.replace(",", ".")
+        for suffix in ("kWh", "KWH", "kW", "KW", "Wh", "MWh"):
+            if raw.endswith(suffix):
+                raw = raw[: -len(suffix)]
+                break
+        if raw == "":
+            return None
         try:
-            return Decimal(str(value).replace(",", "."))
+            return Decimal(raw)
         except (InvalidOperation, ValueError):
             return None
 
     @classmethod
     def _extract_value(cls, row: dict[str, Any]) -> Decimal | None:
         """Extract numeric value from multiple possible API row formats."""
-        direct = (
-            row.get("hodnota")
-            or row.get("value")
-            or row.get("spotreba")
-            or row.get("mnozstvi")
-        )
+        direct = cls._first_present(row, ("hodnota", "value", "spotreba", "mnozstvi"))
         parsed = cls._parse_decimal(direct)
         if parsed is not None:
             return parsed
@@ -266,7 +285,7 @@ class EGDOpenAPICoordinator(DataUpdateCoordinator[CoordinatorPayload]):
     @staticmethod
     def _extract_status(row: dict[str, Any]) -> str:
         """Extract status code from row; support string and object status payload."""
-        raw = row.get("status") or row.get("stav")
+        raw = EGDOpenAPICoordinator._first_present(row, ("status", "stav"))
         if isinstance(raw, dict):
             raw = raw.get("kod") or raw.get("code") or raw.get("status")
         if raw is None:
@@ -282,7 +301,7 @@ class EGDOpenAPICoordinator(DataUpdateCoordinator[CoordinatorPayload]):
     @staticmethod
     def _extract_unit(row: dict[str, Any]) -> str:
         """Extract unit from row; support nested object formats."""
-        raw = row.get("jednotka") or row.get("unit")
+        raw = EGDOpenAPICoordinator._first_present(row, ("jednotka", "unit", "jednotkaKod", "unitCode"))
         if isinstance(raw, dict):
             raw = raw.get("kod") or raw.get("code") or raw.get("unit")
         if raw is None:
