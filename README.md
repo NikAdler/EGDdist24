@@ -80,7 +80,7 @@ Tato chyba nevzniká v kódu této integrace. Obvykle pomůže:
 2. Smazat starý add-on checkout z `/data/addons/git/...` (pokud tam zůstal po testování).
 3. Restartovat Supervisor.
 
-Aktuální verze v tomto repozitáři: **1.1.10**.
+Aktuální verze v tomto repozitáři: **1.1.11**.
 
 ## Licence
 

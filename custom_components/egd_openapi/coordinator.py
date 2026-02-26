@@ -231,12 +231,53 @@ class EGDOpenAPICoordinator(DataUpdateCoordinator[CoordinatorPayload]):
         return None
 
     @staticmethod
+    def _parse_date_part(value: str) -> datetime | None:
+        """Parse date-only strings used by portal/API rows."""
+        raw = value.strip()
+        for fmt in ("%Y-%m-%d", "%d.%m.%Y", "%d.%m.%y", "%d.%m.%Y."):
+            try:
+                return datetime.strptime(raw, fmt)
+            except ValueError:
+                continue
+        return None
+
+    @staticmethod
+    def _parse_interval_start(interval_raw: str) -> tuple[int, int] | None:
+        """Parse interval like '00:00-00:14' and return start hour/minute."""
+        first = interval_raw.strip().split("-")[0].strip()
+        if ":" not in first:
+            return None
+        parts = first.split(":", 1)
+        if len(parts) != 2:
+            return None
+        try:
+            hour = int(parts[0])
+            minute = int(parts[1])
+        except ValueError:
+            return None
+        if not (0 <= hour <= 23 and 0 <= minute <= 59):
+            return None
+        return (hour, minute)
+
+    @staticmethod
     def _parse_timestamp(row: dict[str, Any]) -> datetime | None:
         raw = EGDOpenAPICoordinator._first_present(
             row,
-            ("cas", "timestamp", "datum", "time", "datumOd", "from"),
+            ("cas", "timestamp", "time", "datumOd", "from"),
         )
+
         if raw in (None, ""):
+            # Some payloads provide date and interval separately, e.g. datum='23.2.2026', interval='00:00-00:14'.
+            date_raw = EGDOpenAPICoordinator._first_present(row, ("datum", "date", "den"))
+            interval_raw = EGDOpenAPICoordinator._first_present(row, ("interval", "casovyInterval", "slot"))
+            if isinstance(date_raw, str) and isinstance(interval_raw, str):
+                date_part = EGDOpenAPICoordinator._parse_date_part(date_raw)
+                interval_start = EGDOpenAPICoordinator._parse_interval_start(interval_raw)
+                if date_part is not None and interval_start is not None:
+                    hour, minute = interval_start
+                    parsed_local = date_part.replace(hour=hour, minute=minute, second=0, microsecond=0)
+                    local_tz = dt_util.get_time_zone("Europe/Prague")
+                    return parsed_local.replace(tzinfo=local_tz).astimezone(UTC)
             return None
 
         if isinstance(raw, (int, float)):
